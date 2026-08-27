@@ -22,7 +22,7 @@ export default function Home() {
               dan gamifikasi ekologi. Setor sampah, dapatkan uang & poin, lihat dampak karbonmu.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/(auth)/register">
+              <Link href="/register">
                 <Button size="xl" className="gap-2">
                   Mulai Sekarang <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -89,7 +89,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Kumpulkan Eco-Points, naikkan level dari "Pemula Hijau" hingga "Carbon Neutral Champion",
+                  Kumpulkan Eco-Points, naikkan level dari &quot;Pemula Hijau&quot; hingga &quot;Carbon Neutral Champion&quot;,
                   dan dapatkan badge pencapaian.
                 </p>
               </CardContent>
@@ -206,7 +206,7 @@ export default function Home() {
                 Bergabunglah dengan ribuan pengguna yang sudah mengubah sampah jadi nilai.
                 Daftar gratis, mulai setor hari ini.
               </p>
-              <Link href="/(auth)/register">
+              <Link href="/register">
                 <Button size="xl" variant="secondary" className="gap-2">
                   Daftar Sekarang <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -229,16 +229,16 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Fitur</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/(user)/dashboard" className="hover:text-primary">Dashboard</Link></li>
-                <li><Link href="/(user)/input-sampah" className="hover:text-primary">Input Sampah</Link></li>
-                <li><Link href="/(user)/carbon-tracker" className="hover:text-primary">Carbon Tracker</Link></li>
-                <li><Link href="/(user)/edukasi" className="hover:text-primary">Edukasi</Link></li>
+                <li><Link href="/dashboard" className="hover:text-primary">Dashboard</Link></li>
+                <li><Link href="/input-sampah" className="hover:text-primary">Input Sampah</Link></li>
+                <li><Link href="/carbon-tracker" className="hover:text-primary">Carbon Tracker</Link></li>
+                <li><Link href="/edukasi" className="hover:text-primary">Edukasi</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Petugas</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/(verifier)/scan" className="hover:text-primary">Scan QR</Link></li>
+                <li><Link href="/scan" className="hover:text-primary">Scan QR</Link></li>
                 <li><Link href="#" className="hover:text-primary">Verifikasi</Link></li>
               </ul>
             </div>

@@ -88,7 +88,7 @@ export default function RiwayatPage() {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Silakan login terlebih dahulu</h1>
-        <a href="/(auth)/login" className="text-primary hover:underline">
+        <a href="/login" className="text-primary hover:underline">
           Login di sini
         </a>
       </div>
@@ -137,7 +137,7 @@ export default function RiwayatPage() {
               Mulai setor sampah untuk melihat riwayat transaksimu
             </p>
             <Button asChild>
-              <a href="/(user)/input-sampah">Setor Sampah Sekarang</a>
+              <a href="/input-sampah">Setor Sampah Sekarang</a>
             </Button>
           </CardContent>
         </Card>

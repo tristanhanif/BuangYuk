@@ -122,7 +122,7 @@ export function WasteInputForm() {
       clearItems();
       setPhotos([]);
       setNotes("");
-      router.push("/(user)/riwayat");
+      router.push("/riwayat");
     } catch {
       alert("Gagal mengirim transaksi. Silakan coba lagi.");
     } finally {

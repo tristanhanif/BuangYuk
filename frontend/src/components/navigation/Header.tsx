@@ -46,10 +46,10 @@ export function Header() {
             <span className="font-bold text-xl text-foreground">BuangYuk</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/(auth)/login">
+            <Link href="/login">
               <Button variant="ghost">Masuk</Button>
             </Link>
-            <Link href="/(auth)/register">
+            <Link href="/register">
               <Button>Daftar</Button>
             </Link>
           </div>
@@ -67,32 +67,32 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/(user)/dashboard" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <Leaf className="h-8 w-8 text-primary" />
           <span className="font-bold text-xl text-foreground hidden sm:block">BuangYuk</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
           <Link
-            href="/(user)/dashboard"
+            href="/dashboard"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Dashboard
           </Link>
           <Link
-            href="/(user)/input-sampah"
+            href="/input-sampah"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Setor Sampah
           </Link>
           <Link
-            href="/(user)/carbon-tracker"
+            href="/carbon-tracker"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Carbon Tracker
           </Link>
           <Link
-            href="/(user)/edukasi"
+            href="/edukasi"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Edukasi
@@ -125,13 +125,13 @@ export function Header() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/(user)/profil" className="flex items-center gap-2">
+                <Link href="/profil" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Profil
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/(user)/profil" className="flex items-center gap-2">
+                <Link href="/profil" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Pengaturan
                 </Link>
@@ -163,31 +163,31 @@ export function Header() {
         <div id="mobile-menu" className="md:hidden border-t border-border bg-background py-4">
           <nav className="flex flex-col gap-2 px-4">
             <Link
-              href="/(user)/dashboard"
+              href="/dashboard"
               className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             >
               Dashboard
             </Link>
             <Link
-              href="/(user)/input-sampah"
+              href="/input-sampah"
               className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             >
               Setor Sampah
             </Link>
             <Link
-              href="/(user)/carbon-tracker"
+              href="/carbon-tracker"
               className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             >
               Carbon Tracker
             </Link>
             <Link
-              href="/(user)/edukasi"
+              href="/edukasi"
               className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             >
               Edukasi
             </Link>
             <Link
-              href="/(user)/profil"
+              href="/profil"
               className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             >
               Profil

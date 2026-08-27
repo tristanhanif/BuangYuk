@@ -41,7 +41,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      router.push("/(user)/dashboard");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Gagal login";
       if (message.includes("user-not-found")) {
@@ -62,7 +62,7 @@ export default function LoginPage() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      router.push("/(user)/dashboard");
+      router.push("/dashboard");
     } catch {
       setError("Gagal login dengan Google. Silakan coba lagi.");
     } finally {
@@ -181,7 +181,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Belum punya akun?{" "}
-            <Link href="/(auth)/register" className="text-primary hover:underline font-medium">
+            <Link href="/register" className="text-primary hover:underline font-medium">
               Daftar sekarang
             </Link>
           </p>

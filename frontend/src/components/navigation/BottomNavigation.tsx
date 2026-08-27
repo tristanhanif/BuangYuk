@@ -6,16 +6,16 @@ import { cn } from "@/lib/utils";
 import { Home, Trash2, BarChart3, BookOpen, User, QrCode, ScanLine } from "lucide-react";
 
 const userNavItems = [
-  { href: "/(user)/dashboard", label: "Dashboard", icon: Home },
-  { href: "/(user)/input-sampah", label: "Setor Sampah", icon: Trash2 },
-  { href: "/(user)/carbon-tracker", label: "Carbon Tracker", icon: BarChart3 },
-  { href: "/(user)/edukasi", label: "Edukasi", icon: BookOpen },
-  { href: "/(user)/profil", label: "Profil", icon: User },
+  { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/input-sampah", label: "Setor Sampah", icon: Trash2 },
+  { href: "/carbon-tracker", label: "Carbon Tracker", icon: BarChart3 },
+  { href: "/edukasi", label: "Edukasi", icon: BookOpen },
+  { href: "/profil", label: "Profil", icon: User },
 ];
 
 const verifierNavItems = [
-  { href: "/(verifier)/scan", label: "Scan QR", icon: QrCode },
-  { href: "/(verifier)/scan", label: "Verifikasi", icon: ScanLine },
+  { href: "/scan", label: "Scan QR", icon: QrCode },
+  { href: "/scan", label: "Verifikasi", icon: ScanLine },
 ];
 
 export function BottomNavigation({ role = "user" }: { role?: "user" | "verifier" }) {

@@ -50,7 +50,7 @@ export default function ScanPage() {
         return;
       }
 
-      router.push(`/(verifier)/verifikasi/${transactionId.trim()}`);
+      router.push(`/verifikasi/${transactionId.trim()}`);
     } catch {
       setError("Gagal memeriksa transaksi. Silakan coba lagi.");
     } finally {
@@ -80,7 +80,7 @@ export default function ScanPage() {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Silakan login terlebih dahulu</h1>
-        <a href="/(auth)/login" className="text-primary hover:underline">
+        <a href="/login" className="text-primary hover:underline">
           Login di sini
         </a>
       </div>

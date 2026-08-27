@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body } from "@nestjs/common";
+import { Controller, Post, Get, UseGuards, Body } from "@nestjs/common";
 import { AuthGuard } from "@/common/guards/authGuard";
 import { RoleGuard } from "@/common/guards/roleGuard";
 import { wasteSchema, verificationSchema, rewardSchema } from "@/common/validators";
@@ -29,7 +29,7 @@ export class TransactionsController {
   }
 
   @Post("verify")
-  @UseGuards(AuthGuard, new (RoleGuard)([ "VERIFIER", "ADMIN" ]))
+  @UseGuards(AuthGuard, new (RoleGuard)(["VERIFIER", "ADMIN"]))
   async verifyWasteTransaction(@Body() body: any) {
     const parsed = verificationSchema.parse(body);
     const result = await this.transactionService.executeVerificationTransaction(
@@ -63,7 +63,7 @@ export class TransactionsController {
 
   @Get()
   @UseGuards(AuthGuard)
-  getTransactions(@Body() body: any) {
+  getTransactions() {
     return {
       success: true,
       data: [],

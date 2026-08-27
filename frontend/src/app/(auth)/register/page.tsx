@@ -79,7 +79,7 @@ export default function RegisterPage() {
         lastUpdated: serverTimestamp(),
       });
 
-      router.push("/(user)/dashboard");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Gagal mendaftar";
       if (message.includes("email-already-in-use")) {
@@ -121,7 +121,7 @@ export default function RegisterPage() {
         lastUpdated: serverTimestamp(),
       });
 
-      router.push("/(user)/dashboard");
+      router.push("/dashboard");
     } catch {
       setError("Gagal mendaftar dengan Google. Silakan coba lagi.");
     } finally {
@@ -290,7 +290,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Sudah punya akun?{" "}
-            <Link href="/(auth)/login" className="text-primary hover:underline font-medium">
+            <Link href="/login" className="text-primary hover:underline font-medium">
               Masuk di sini
             </Link>
           </p>

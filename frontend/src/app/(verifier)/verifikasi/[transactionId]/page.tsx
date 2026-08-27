@@ -144,7 +144,7 @@ export default function VerificationPage() {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Silakan login terlebih dahulu</h1>
-        <a href="/(auth)/login" className="text-primary hover:underline">
+        <a href="/login" className="text-primary hover:underline">
           Login di sini
         </a>
       </div>
@@ -159,7 +159,7 @@ export default function VerificationPage() {
         <p className="text-muted-foreground mb-4">
           ID transaksi &ldquo;{transactionId}&rdquo; tidak ditemukan.
         </p>
-        <Button onClick={() => router.push("/(verifier)/scan")}>
+        <Button onClick={() => router.push("/scan")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Kembali ke Scanner
         </Button>
@@ -175,7 +175,7 @@ export default function VerificationPage() {
         </div>
         <h1 className="text-2xl font-bold mb-2">Verifikasi Selesai</h1>
         <p className="text-muted-foreground mb-6">{successMessage}</p>
-        <Button onClick={() => router.push("/(verifier)/scan")}>
+        <Button onClick={() => router.push("/scan")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Scan Transaksi Lain
         </Button>
@@ -207,7 +207,7 @@ export default function VerificationPage() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/(verifier)/scan")}>
+        <Button variant="ghost" size="icon" onClick={() => router.push("/scan")}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>

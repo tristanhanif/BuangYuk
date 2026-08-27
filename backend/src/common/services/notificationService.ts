@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import * as admin from "firebase-admin";
+import { messaging } from "@/common/firebaseAdmin";
 
 @Injectable()
 export class NotificationService {
@@ -9,7 +9,7 @@ export class NotificationService {
     co2eSaved: number,
     earnedEcoPoints: number
   ) {
-    const payload: admin.messaging.Message = {
+    const payload = {
       notification: {
         title: "Verifikasi Berhasil",
         body: `Transaksi ${transactionId} telah diverifikasi. Emisi terkurangi ${co2eSaved.toFixed(2)} kg CO2e, earned ${earnedEcoPoints} Eco-Points`,
@@ -18,9 +18,9 @@ export class NotificationService {
     };
 
     try {
-      const response = await admin.messaging().send(payload);
+      const response = await messaging.send(payload);
       return { success: true, response };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
@@ -30,7 +30,7 @@ export class NotificationService {
     transactionId: string,
     categoryName: string
   ) {
-    const payload: admin.messaging.Message = {
+    const payload = {
       notification: {
         title: "Transaksi Baru Dibuat",
         body: `Setoran sampah ${categoryName} berhasil dibuat dengan ID ${transactionId}`,
@@ -39,9 +39,9 @@ export class NotificationService {
     };
 
     try {
-      const response = await admin.messaging().send(payload);
+      const response = await messaging.send(payload);
       return { success: true, response };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }

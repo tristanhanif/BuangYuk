@@ -1,5 +1,4 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
-import { auth } from "firebase-admin";
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -7,7 +6,7 @@ export class RoleGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const user = request.user as Record<string, any>;
+    const user = (request as any).user as Record<string, any>;
 
     if (!user || !user.customClaims) {
       return false;

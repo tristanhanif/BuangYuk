@@ -13,7 +13,7 @@ interface QuickActionGridProps {
 export function QuickActionGrid({ className }: QuickActionGridProps) {
   const actions = [
     {
-      href: "/(user)/input-sampah",
+      href: "/input-sampah",
       icon: Plus,
       label: "Setor Sampah",
       desc: "Catat & kirim sampah untuk diverifikasi",
@@ -21,7 +21,7 @@ export function QuickActionGrid({ className }: QuickActionGridProps) {
       iconColor: "text-green-600",
     },
     {
-      href: "/(user)/carbon-tracker",
+      href: "/carbon-tracker",
       icon: TrendingUp,
       label: "Carbon Tracker",
       desc: "Lihat grafik & detail dampak karbonmu",
@@ -29,7 +29,7 @@ export function QuickActionGrid({ className }: QuickActionGridProps) {
       iconColor: "text-blue-600",
     },
     {
-      href: "/(user)/edukasi",
+      href: "/edukasi",
       icon: Leaf,
       label: "Edukasi & Tips",
       desc: "Artikel & tips personalisis daur ulang",
@@ -37,7 +37,7 @@ export function QuickActionGrid({ className }: QuickActionGridProps) {
       iconColor: "text-emerald-600",
     },
     {
-      href: "/(user)/profil",
+      href: "/profil",
       icon: Gift,
       label: "Tukar Poin",
       desc: "Tukar Eco-Points jadi voucher/hadiah",
