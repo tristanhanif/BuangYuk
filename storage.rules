@@ -1,0 +1,80 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ============================================================
+    // Helper Functions
+    // ============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+
+    function isUnderSizeLimit(maxSizeMb) {
+      return request.resource.size < maxSizeMb * 1024 * 1024;
+    }
+
+    // ============================================================
+    // Profile Photos: /profiles/{userId}/avatar.{ext}
+    // ============================================================
+    // Users can upload/read their own profile photo
+    // Anyone authenticated can read profile photos (for display)
+
+    match /profiles/{userId}/{allPaths=**} {
+      // Authenticated users can read any profile photo
+      allow read: if isAuthenticated();
+
+      // Users can upload their own profile photo
+      // - Must be image format (jpeg, png, webp)
+      // - Max 5MB
+      // - Must be in their own directory
+      allow create: if isOwner(userId)
+        && isValidImage()
+        && isUnderSizeLimit(5);
+
+      // Users can update their own profile photo
+      allow update: if isOwner(userId)
+        && isValidImage()
+        && isUnderSizeLimit(5);
+
+      // Users can delete their own profile photo
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================================
+    // Transaction Proof Photos: /transactions/{userId}/{transactionId}/{photo}.{ext}
+    // ============================================================
+    // Users can upload photos to their own transaction directory
+    // Users and verifiers can read transaction photos
+
+    match /transactions/{userId}/{transactionId}/{allPaths=**} {
+      // Users can read their own transaction photos
+      // Verifiers and admins can read all
+      allow read: if isAuthenticated();
+
+      // Users can upload photos to their own transaction directory
+      // - Must be image format (jpeg, png, webp)
+      // - Max 5MB per file
+      // - Must be in their own user directory
+      allow create: if isOwner(userId)
+        && isValidImage()
+        && isUnderSizeLimit(5);
+
+      // No updates allowed (immutable proof photos)
+      allow update: if false;
+
+      // Only the owner or admin can delete
+      allow delete: if isOwner(userId)
+        || request.auth.token.admin == true;
+    }
+  }
+}

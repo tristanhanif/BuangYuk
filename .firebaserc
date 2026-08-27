@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "buang-yuk"
+  },
+  "targets": {
+    "buang-yuk": {
+      "storage": {
+        "buang-yuk.appspot.com": [
+          "objects"
+        ]
+      }
+    }
+  }
+}

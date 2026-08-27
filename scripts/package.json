@@ -1,0 +1,14 @@
+{
+  "name": "buangyuk-scripts",
+  "version": "1.0.0",
+  "description": "Database initialization and seed scripts for BuangYuk",
+  "private": true,
+  "scripts": {
+    "db:init": "node init-database.js",
+    "db:seed-categories": "node seed-waste-categories.js",
+    "db:setup-admin": "node init-database.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
