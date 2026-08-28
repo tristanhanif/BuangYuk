@@ -47,7 +47,10 @@ export function CarbonTrackerWidget({ ecoSummary }: CarbonTrackerWidgetProps) {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 text-blue-600 mb-3">
               <Target className="h-7 w-7" />
             </div>
-            <p className="text-3xl font-bold text-foreground">{currentLevel.badge} Level {currentLevel.level}</p>
+            <p className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
+              {<currentLevel.badge className="h-6 w-6" aria-hidden="true" />}
+              Level {currentLevel.level}
+            </p>
             <p className="text-sm text-muted-foreground">{currentLevel.name}</p>
           </div>
         </div>
@@ -83,15 +86,15 @@ export function CarbonTrackerWidget({ ecoSummary }: CarbonTrackerWidgetProps) {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           {ECO_LEVELS.slice(0, currentLevel.level).map((level) => (
             <Badge key={level.level} variant="success" className="text-xs">
-              {level.badge} {level.name}
+              {<level.badge className="h-4 w-4 inline-block" aria-hidden="true" />} {level.name}
             </Badge>
           ))}
           {ECO_LEVELS.slice(currentLevel.level, currentLevel.level + 1).map((level) => (
             <Badge key={level.level} variant="outline" className="text-xs opacity-50">
-              {level.badge} {level.name}
+              {<level.badge className="h-4 w-4 inline-block" aria-hidden="true" />} {level.name}
             </Badge>
           ))}
         </div>

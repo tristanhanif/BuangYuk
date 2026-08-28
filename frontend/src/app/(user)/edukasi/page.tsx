@@ -1,151 +1,122 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { articlesMock } from "@/mocks/articlesMock";
+import { formatDate, cn } from "@/lib/utils";
 import {
   BookOpen,
   Leaf,
   Recycle,
-  Zap,
   Droplet,
-  Sun,
-  TreePine,
-  Factory,
   ArrowRight,
   Search,
+  Sparkles,
+  Lightbulb,
+  Newspaper,
+  FlaskConical,
+  Clock,
 } from "lucide-react";
-
-const articles = [
-  {
-    id: 1,
-    title: "Mengapa Daur Ulang Plastik Penting untuk Bumi?",
-    category: "Daur Ulang",
-    icon: Recycle,
-    color: "bg-green-50 text-green-600",
-    readTime: "5 menit",
-    summary:
-      "Plastik membutuhkan 500-1000 tahun untuk terurai. Daur ulang 1 kg plastik PET dapat mengurangi 2.5 kg emisi CO₂. Pelajari bagaimana proses daur ulang bekerja dan dampak nyatanya.",
-    tags: ["Plastik", "CO₂", "Lingkungan"],
-  },
-  {
-    id: 2,
-    title: "E-Waste: Bahaya Tersembunyi di Gadget Rusak",
-    category: "E-Waste",
-    icon: Zap,
-    color: "bg-purple-50 text-purple-600",
-    readTime: "7 menit",
-    summary:
-      "Satu ponsel mengandung emas, perak, dan tembaga yang bisa didaur ulang. Namun juga mengandung merkuri dan timbal yang berbahaya jika dibuang sembarangan.",
-    tags: ["Elektronik", "Bahaya", "Daur Ulang"],
-  },
-  {
-    id: 3,
-    title: "Membuat Kompos dari Sampah Organik Rumah Tangga",
-    category: "Tips",
-    icon: Leaf,
-    color: "bg-emerald-50 text-emerald-600",
-    readTime: "4 menit",
-    summary:
-      "Sampah organik mencakup 60% volume sampah rumah tangga. Komposting dapat mengurangi emisi metana dari TPA hingga 50%.",
-    tags: ["Organik", "Kompos", "Rumah Tangga"],
-  },
-  {
-    id: 4,
-    title: "Menghitung Jejak Karbon Pribadi Anda",
-    category: "Edukasi",
-    icon: Factory,
-    color: "bg-blue-50 text-blue-600",
-    readTime: "6 menit",
-    summary:
-      "Rata-rata orang Indonesia menghasilkan 2.4 ton CO₂ per tahun. Pelajari cara menghitung dan mengurangi jejak karbonmu melalui pengelolaan sampah.",
-    tags: ["Karbon", "Kalkulasi", "Pribadi"],
-  },
-  {
-    id: 5,
-    title: "10 Kebiasaan Zero Waste untuk Pemula",
-    category: "Gaya Hidup",
-    icon: Sun,
-    color: "bg-amber-50 text-amber-600",
-    readTime: "3 menit",
-    summary:
-      "Mulai dari membawa tas belanja sendiri, menghindari kemasan sekali pakai, hingga memilih produk refill. Langkah kecil yang berdampak besar.",
-    tags: ["Zero Waste", "Kebiasaan", "Pemula"],
-  },
-  {
-    id: 6,
-    title: "Manfaat Ekonomi Daur Ulang bagi Komunitas",
-    category: "Ekonomi",
-    icon: TreePine,
-    color: "bg-teal-50 text-teal-600",
-    readTime: "5 menit",
-    summary:
-      "Bank sampah dapat menciptakan lapangan kerja dan menghasilkan Rp 1.5-15.000 per kg sampah terkumpul. Daur ulang bukan hanya soal lingkungan, tapi juga ekonomi.",
-    tags: ["Ekonomi", "Komunitas", "Bank Sampah"],
-  },
-];
 
 const tips = [
   {
     icon: Droplet,
     title: "Cuci Kemasan Sebelum Dibuang",
     desc: "Botol dan kaleng yang bersih memiliki nilai jual 30% lebih tinggi.",
-    color: "bg-blue-50 text-blue-600",
+    color: "from-blue-500/15 to-blue-600/5 text-blue-600",
   },
   {
     icon: Recycle,
     title: "Pisahkan dari Sumber",
     desc: "Pisahkan sampah organik dan anorganik sejak di rumah.",
-    color: "bg-green-50 text-green-600",
-  },
-  {
-    icon: Zap,
-    title: "Kumpulkan E-Waste Terpisah",
-    desc: "HP, kabel, baterai, dan charger harus dikumpulkan di kotak khusus.",
-    color: "bg-purple-50 text-purple-600",
-  },
-  {
-    icon: Sun,
-    title: "Lipat Karton dengan Rapi",
-    desc: "Memplatkan karton menghemat volume transportasi hingga 80%.",
-    color: "bg-amber-50 text-amber-600",
+    color: "from-green-500/15 to-green-600/5 text-green-600",
   },
   {
     icon: Leaf,
     title: "Jadwal Setor Rutin",
     desc: "Tetapkan hari tetap untuk setor sampah, misal setiap Sabtu pagi.",
-    color: "bg-emerald-50 text-emerald-600",
+    color: "from-emerald-500/15 to-emerald-600/5 text-emerald-600",
   },
   {
-    icon: TreePine,
-    title: "Pilih Kemasan Daur Ulang",
-    desc: "Belilah produk dengan label rPET atau recycled material.",
-    color: "bg-teal-50 text-teal-600",
+    icon: Lightbulb,
+    title: "Kurangi Penggunaan Plastik",
+    desc: "Bawa tas belanja sendiri dan tolak sedotan plastik sekali pakai.",
+    color: "from-amber-500/15 to-amber-600/5 text-amber-600",
   },
+  {
+    icon: Recycle,
+    title: "Perbaiki, Jangan Buang",
+    desc: "Rusak sedikit? Perbaiki dulu sebelum memutuskan membuang barang.",
+    color: "from-sky-500/15 to-sky-600/5 text-sky-600",
+  },
+  {
+    icon: Leaf,
+    title: "Kompos Sisa Makanan",
+    desc: "Olah sisa dapur menjadi kompos untuk menyuburkan tanamanmu.",
+    color: "from-teal-500/15 to-teal-600/5 text-teal-600",
+  },
+];
+
+const CATEGORY_STYLES: Record<string, { label: string; badge: "success" | "info" | "warning" }> = {
+  "Tips Pemilahan": { label: "Tips Pemilahan", badge: "success" },
+  "Fakta Daur Ulang": { label: "Fakta Daur Ulang", badge: "info" },
+  "Dampak Lingkungan": { label: "Dampak Lingkungan", badge: "warning" },
+};
+
+const categoryFilters: Array<{ label: string; value: string }> = [
+  { label: "Semua", value: "all" },
+  { label: "Tips Pemilahan", value: "Tips Pemilahan" },
+  { label: "Fakta Daur Ulang", value: "Fakta Daur Ulang" },
+  { label: "Dampak Lingkungan", value: "Dampak Lingkungan" },
 ];
 
 export default function EdukasiPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  const filteredArticles = articles.filter(
-    (article) =>
+  const filteredArticles = articlesMock.filter((article) => {
+    const matchSearch =
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.tags.some((tag) =>
-        tag.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-  );
+      article.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchCategory = activeCategory === "all" || article.category === activeCategory;
+    return matchSearch && matchCategory;
+  });
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Edukasi & Tips</h1>
-        <p className="text-muted-foreground">
-          Artikel dan tips untuk mengelola sampah dengan lebih baik
-        </p>
+      {/* Hero */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-500 p-6 text-white shadow-lg sm:p-8">
+        <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-teal-200/20 blur-3xl" />
+        <div className="relative">
+          <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide backdrop-blur-sm">
+            <Sparkles className="h-3.5 w-3.5" />
+            Pusat Edukasi
+          </span>
+          <h1 className="text-2xl font-bold leading-tight sm:text-3xl">Edukasi & Tips</h1>
+          <p className="mt-2 max-w-lg text-sm text-white/85">
+            Artikel dan tips untuk mengelola sampah dengan lebih baik — mulai dari
+            memilah, mendaur ulang, hingga memahami dampaknya terhadap lingkungan.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Newspaper className="h-4 w-4 text-white/70" />
+              <span>{articlesMock.length} Artikel Edukasi</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Lightbulb className="h-4 w-4 text-white/70" />
+              <span>{tips.length} Tips Praktis</span>
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
@@ -153,83 +124,110 @@ export default function EdukasiPage() {
           placeholder="Cari artikel atau topik..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-card text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
 
       <Tabs defaultValue="articles" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="articles" className="flex items-center gap-2">
+        <TabsList className="mb-4 grid w-full max-w-md grid-cols-2 rounded-xl p-1">
+          <TabsTrigger value="articles" className="flex items-center gap-2 rounded-lg">
             <BookOpen className="h-4 w-4" />
             Artikel
           </TabsTrigger>
-          <TabsTrigger value="tips" className="flex items-center gap-2">
+          <TabsTrigger value="tips" className="flex items-center gap-2 rounded-lg">
             <Leaf className="h-4 w-4" />
             Tips Cepat
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="articles" className="space-y-4 mt-4">
+        <TabsContent value="articles" className="mt-4 space-y-5">
+          {/* Category filter chips */}
+          <div className="flex flex-wrap gap-2">
+            {categoryFilters.map((filter) => {
+              const isActive = activeCategory === filter.value;
+              return (
+                <button
+                  key={filter.value}
+                  onClick={() => setActiveCategory(filter.value)}
+                  className={cn(
+                    "rounded-full px-4 py-2 text-sm font-medium transition-all",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                      : "border border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                  )}
+                >
+                  {filter.label}
+                </button>
+              );
+            })}
+          </div>
+
           {filteredArticles.length === 0 ? (
             <Card>
-              <CardContent className="py-12 text-center">
-                <Search className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-                <p className="text-muted-foreground">
+              <CardContent className="py-16 text-center">
+                <Search className="mx-auto mb-4 h-12 w-12 text-muted-foreground/30" />
+                <p className="text-lg font-medium text-foreground">
                   Tidak ditemukan artikel untuk &ldquo;{searchQuery}&rdquo;
                 </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Coba kata kunci lain atau pilih kategori yang berbeda.
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setActiveCategory("all");
+                  }}
+                >
+                  Reset Filter
+                </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredArticles.map((article) => {
-                const Icon = article.icon;
+                const catStyle = CATEGORY_STYLES[article.category] ?? CATEGORY_STYLES["Tips Pemilahan"];
                 return (
-                  <Card
+                  <Link
                     key={article.id}
-                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    href={`/edukasi/${article.id}`}
+                    className="group flex flex-col"
                   >
-                    <CardContent className="p-5">
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`inline-flex items-center justify-center w-12 h-12 rounded-lg shrink-0 ${article.color}`}
+                    <Card className="flex h-full flex-col overflow-hidden border-border transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                        <img
+                          src={article.imageUrl}
+                          alt={article.altText}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                        <Badge
+                          variant={catStyle.badge}
+                          className="absolute left-3 top-3 border-0 shadow-sm"
                         >
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary" className="text-xs">
-                              {article.category}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {article.readTime}
-                            </span>
-                          </div>
-                          <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
-                            {article.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                            {article.summary}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex gap-1">
-                              {article.tags.slice(0, 2).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                            <Button variant="ghost" size="sm" className="text-primary">
-                              Baca
-                              <ArrowRight className="ml-1 h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
+                          {article.category}
+                        </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
+                      <CardContent className="flex flex-1 flex-col p-5">
+                        <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          {formatDate(article.date)}
+                        </div>
+                        <h3 className="mb-2 line-clamp-2 font-semibold text-foreground">
+                          {article.title}
+                        </h3>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                          {article.summary}
+                        </p>
+                        <div className="mt-4 flex items-center gap-1.5 pt-1 text-sm font-medium text-primary">
+                          Baca Selengkapnya
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 );
               })}
             </div>
@@ -237,23 +235,40 @@ export default function EdukasiPage() {
         </TabsContent>
 
         <TabsContent value="tips" className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {tips.map((tip, index) => {
               const Icon = tip.icon;
               return (
-                <Card key={index} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-5">
-                    <div
-                      className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 ${tip.color}`}
-                    >
-                      <Icon className="h-6 w-6" />
+                <Card
+                  key={index}
+                  className="relative overflow-hidden border-border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60", tip.color)} />
+                  <CardContent className="relative p-5">
+                    <div className="flex items-start justify-between">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-border">
+                        <Icon className="h-6 w-6 text-foreground/80" />
+                      </div>
+                      <span className="text-3xl font-bold text-foreground/10">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
                     </div>
-                    <h3 className="font-semibold text-foreground mb-2">{tip.title}</h3>
-                    <p className="text-sm text-muted-foreground">{tip.desc}</p>
+                    <h3 className="mt-4 font-semibold text-foreground">{tip.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{tip.desc}</p>
                   </CardContent>
                 </Card>
               );
             })}
+          </div>
+
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700">
+              <FlaskConical className="h-5 w-5" />
+            </div>
+            <p className="text-xs text-emerald-800">
+              Estimasi dampak karbon dihitung menggunakan pendekatan dari EPA Waste Reduction Model
+              (WARM), dibulatkan untuk kebutuhan simulasi aplikasi — bukan angka sertifikasi karbon resmi.
+            </p>
           </div>
         </TabsContent>
       </Tabs>

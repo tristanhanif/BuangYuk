@@ -6,11 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ECO_LEVELS } from "@/lib/constants";
 import { getEcoLevel, getNextLevel } from "@/lib/utils";
-import { formatCurrency, formatNumber, formatDate } from "@/lib/utils";
+import { formatNumber, formatDate } from "@/lib/utils";
 import {
   User,
   Mail,
@@ -18,11 +17,13 @@ import {
   Calendar,
   Award,
   Leaf,
-  TrendingUp,
   Settings,
   LogOut,
   ChevronRight,
   Shield,
+  Globe,
+  MapPin,
+  Info,
 } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
@@ -102,7 +103,7 @@ export default function ProfilPage() {
               )}
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant="success">
-                  {currentLevel.badge} {currentLevel.name}
+                  {<currentLevel.badge className="h-4 w-4" aria-hidden="true" />} {currentLevel.name}
                 </Badge>
                 <Badge variant="outline">Level {currentLevel.level}</Badge>
               </div>
@@ -180,7 +181,7 @@ export default function ProfilPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{level.badge}</span>
+                    {<level.badge className="h-6 w-6" aria-hidden="true" />}
                     <div>
                       <p className="font-medium text-sm">{level.name}</p>
                       <p className="text-xs text-muted-foreground">
@@ -201,38 +202,81 @@ export default function ProfilPage() {
         </CardContent>
       </Card>
 
+      {/* Quick links */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="divide-y divide-border">
+            <a
+              href="/profil/level"
+              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Leaf className="h-5 w-5 text-green-600" />
+                <span className="text-sm font-medium">Detail Level & Mascot</span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
+            <a
+              href="/profil/badge"
+              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Award className="h-5 w-5 text-amber-500" />
+                <span className="text-sm font-medium">Pencapaian (Lencana)</span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+
+
       {/* Settings Menu */}
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            <button className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+            <a href="/profil/pengaturan" className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
                 <Settings className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm font-medium">Pengaturan</span>
+                <span className="text-sm font-medium">Pengaturan Akun</span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
-            <button className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+            </a>
+            <a href="/profil/keamanan" className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
                 <Shield className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm font-medium">Keamanan Akun</span>
+                <span className="text-sm font-medium">Keamanan & Privasi</span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
-            <button className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+            </a>
+            <a href="/profil/edit" className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
                 <User className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">Edit Profil</span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
-            <button className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+            </a>
+            <a href="/profil/bahasa" className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
-                <TrendingUp className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm font-medium">Riwayat Transaksi</span>
+                <Globe className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Bahasa</span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
+            </a>
+            <a href="/profil/lokasi" className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Lokasi</span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
+            <a href="/profil/informasi" className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <Info className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Informasi</span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
           </div>
         </CardContent>
       </Card>

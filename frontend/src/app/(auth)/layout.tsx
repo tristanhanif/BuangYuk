@@ -1,13 +1,30 @@
 "use client";
 
-import { Header } from "@/components/navigation/Header";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/dashboard");
+    }
+  }, [user, router]);
+
+  if (loading) {
+    return null;
+  }
+
+  if (user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 flex flex-col justify-center">
         {children}
       </main>
     </div>

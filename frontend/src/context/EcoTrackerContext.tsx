@@ -19,11 +19,7 @@ export function EcoTrackerProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setEcoSummary(null);
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
     const summaryRef = doc(db, "user_eco_summaries", user.uid);
     const unsubscribe = onSnapshot(summaryRef, (snapshot) => {
@@ -51,7 +47,7 @@ export function EcoTrackerProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   return (
-    <EcoTrackerContext.Provider value={{ ecoSummary, loading }}>
+    <EcoTrackerContext.Provider value={{ ecoSummary: user ? ecoSummary : null, loading: user ? loading : false }}>
       {children}
     </EcoTrackerContext.Provider>
   );
