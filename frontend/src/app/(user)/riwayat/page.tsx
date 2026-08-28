@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -28,7 +29,6 @@ import {
   CheckCircle2,
   XCircle,
   Truck,
-  Package,
   Filter,
   Inbox,
 } from "lucide-react";
@@ -47,10 +47,7 @@ export default function RiwayatPage() {
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
     const q = query(
       collection(db, "transactions"),
@@ -73,7 +70,7 @@ export default function RiwayatPage() {
     return () => unsubscribe();
   }, [user]);
 
-  if (authLoading || loading) {
+  if (authLoading || (user && loading)) {
     return (
       <div className="space-y-4 animate-pulse">
         <div className="h-8 bg-muted rounded w-1/4" />
@@ -136,9 +133,9 @@ export default function RiwayatPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Mulai setor sampah untuk melihat riwayat transaksimu
             </p>
-            <Button asChild>
-              <a href="/input-sampah">Setor Sampah Sekarang</a>
-            </Button>
+            <Link href="/input-sampah" className={buttonVariants()}>
+              Setor Sampah Sekarang
+            </Link>
           </CardContent>
         </Card>
       ) : (
@@ -201,12 +198,13 @@ export default function RiwayatPage() {
                   <div className="flex flex-wrap gap-2">
                     {txn.items?.map((item, idx) => {
                       const cat = WASTE_CATEGORIES.find((c) => c.id === item.categoryId);
+                      const CatIcon = cat?.icon;
                       return (
                         <span
                           key={idx}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs"
                         >
-                          {cat?.icon} {cat?.label} ({item.weightKg.toFixed(1)} kg)
+                          {CatIcon && <CatIcon className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />} {cat?.label} ({item.weightKg.toFixed(1)} kg)
                         </span>
                       );
                     })}

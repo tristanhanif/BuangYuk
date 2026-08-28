@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { calculateCO2Saved, calculateEarnings, calculatePoints } from "@/lib/utils";
-import { EMISSION_FACTORS, PRICE_PER_KG, POINTS_PER_KG, UNIT_CONVERSIONS } from "@/lib/constants";
+import { UNIT_CONVERSIONS } from "@/lib/constants";
 import { WasteInput } from "@/types/waste";
 
 interface UseWasteCalculatorReturn {

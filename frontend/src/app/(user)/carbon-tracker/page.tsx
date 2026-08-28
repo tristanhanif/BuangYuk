@@ -3,10 +3,9 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useEcoTracker } from "@/context/EcoTrackerContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ECO_LEVELS, WASTE_CATEGORIES } from "@/lib/constants";
+import { WASTE_CATEGORIES } from "@/lib/constants";
 import { getEcoLevel, getNextLevel } from "@/lib/utils";
 import { formatNumber } from "@/lib/utils";
 import {
@@ -32,6 +31,14 @@ import {
   Info,
   Lock,
   CheckCircle2,
+  Leaf,
+  Droplet,
+  Cpu,
+  Globe,
+  Recycle,
+  Newspaper,
+  Flame,
+  type LucideIcon,
 } from "lucide-react";
 
 const CHART_COLORS = [
@@ -52,15 +59,15 @@ const CHART_COLORS = [
   "#0EA5E9",
 ];
 
-const BADGES = [
-  { id: "first-deposit", name: "Setor Pertama", desc: "Melakukan setoran sampah pertama", icon: "🌱", requirement: "1 transaksi" },
-  { id: "plastic-fighter", name: "Plastic Fighter", desc: "Mengumpulkan 10kg plastik", icon: "🥤", requirement: "10 kg plastik" },
-  { id: "e-waste-hero", name: "E-Waste Hero", desc: "Menyetor 5 item e-waste", icon: "💻", requirement: "5 item e-waste" },
-  { id: "carbon-saver", name: "Carbon Saver", desc: "Menyelamatkan 50kg CO₂e", icon: "🌍", requirement: "50 kg CO₂e" },
-  { id: "eco-warrior", name: "Eco Warrior", desc: "Mencapai Level 3", icon: "♻️", requirement: "Level 3" },
-  { id: "tree-planter", name: "Tree Planter", desc: "Setara menanam 10 pohon", icon: "🌳", requirement: "10 pohon setara" },
-  { id: "paper-master", name: "Paper Master", desc: "Menyetor 20kg kertas", icon: "📄", requirement: "20 kg kertas" },
-  { id: "weekly-streak", name: "Weekly Streak", desc: "Setor 4x dalam sebulan", icon: "🔥", requirement: "4x/bulan" },
+const BADGES: { id: string; name: string; desc: string; icon: LucideIcon; requirement: string }[] = [
+  { id: "first-deposit", name: "Setor Pertama", desc: "Melakukan setoran sampah pertama", icon: Leaf, requirement: "1 transaksi" },
+  { id: "plastic-fighter", name: "Plastic Fighter", desc: "Mengumpulkan 10kg plastik", icon: Droplet, requirement: "10 kg plastik" },
+  { id: "e-waste-hero", name: "E-Waste Hero", desc: "Menyetor 5 item e-waste", icon: Cpu, requirement: "5 item e-waste" },
+  { id: "carbon-saver", name: "Carbon Saver", desc: "Menyelamatkan 50kg CO₂e", icon: Globe, requirement: "50 kg CO₂e" },
+  { id: "eco-warrior", name: "Eco Warrior", desc: "Mencapai Level 3", icon: Recycle, requirement: "Level 3" },
+  { id: "tree-planter", name: "Tree Planter", desc: "Setara menanam 10 pohon", icon: TreePine, requirement: "10 pohon setara" },
+  { id: "paper-master", name: "Paper Master", desc: "Menyetor 20kg kertas", icon: Newspaper, requirement: "20 kg kertas" },
+  { id: "weekly-streak", name: "Weekly Streak", desc: "Setor 4x dalam sebulan", icon: Flame, requirement: "4x/bulan" },
 ];
 
 export default function CarbonTrackerPage() {
@@ -143,7 +150,9 @@ export default function CarbonTrackerPage() {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-foreground">{currentLevel.badge} Lv.{currentLevel.level}</p>
+            <p className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
+              {<currentLevel.badge className="h-6 w-6" aria-hidden="true" />} Lv.{currentLevel.level}
+            </p>
             <p className="text-xs text-muted-foreground">{currentLevel.name}</p>
           </CardContent>
         </Card>
@@ -161,14 +170,16 @@ export default function CarbonTrackerPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="font-medium">
-                  {currentLevel.badge} {currentLevel.name}
+                <p className="font-medium flex items-center gap-1.5">
+                  {<currentLevel.badge className="h-5 w-5 text-green-600" aria-hidden="true" />}
+                  {currentLevel.name}
                 </p>
                 <p className="text-sm text-muted-foreground">Level saat ini</p>
               </div>
               <div className="text-right">
-                <p className="font-medium">
-                  {nextLevel.badge} {nextLevel.name}
+                <p className="font-medium flex items-center justify-end gap-1.5">
+                  {<nextLevel.badge className="h-5 w-5 text-green-600" aria-hidden="true" />}
+                  {nextLevel.name}
                 </p>
                 <p className="text-sm text-muted-foreground">Level berikutnya</p>
               </div>
@@ -288,6 +299,7 @@ export default function CarbonTrackerPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {BADGES.map((badge) => {
               const unlocked = (ecoSummary?.totalTransactions || 0) > 0;
+              const IconComp = badge.icon;
               return (
                 <div
                   key={badge.id}
@@ -298,7 +310,7 @@ export default function CarbonTrackerPage() {
                   }`}
                 >
                   <div className="relative">
-                    <span className="text-3xl block mb-2">{badge.icon}</span>
+                    <IconComp className="h-8 w-8 mx-auto mb-2 text-emerald-600" strokeWidth={1.5} aria-hidden="true" />
                     {!unlocked && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Lock className="h-4 w-4 text-muted-foreground" />

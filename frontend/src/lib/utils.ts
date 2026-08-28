@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { ECO_LEVELS } from "@/lib/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -106,27 +107,14 @@ export function calculatePoints(category: string, weightKg: number): number {
 }
 
 export function getEcoLevel(totalPoints: number) {
-  const levels = [
-    { level: 1, name: "Pemula Hijau", minPoints: 0, maxPoints: 99, badge: "🌱" },
-    { level: 2, name: "Penjaga Bumi", minPoints: 100, maxPoints: 499, badge: "🌿" },
-    { level: 3, name: "Pahlawan Daur Ulang", minPoints: 500, maxPoints: 1999, badge: "♻️" },
-    { level: 4, name: "Plastic Fighter", minPoints: 2000, maxPoints: 4999, badge: "🥤" },
-    { level: 5, name: "E-Waste Pioneer", minPoints: 5000, maxPoints: 9999, badge: "💻" },
-    { level: 6, name: "Carbon Neutral Champion", minPoints: 10000, maxPoints: Infinity, badge: "🌍" },
-  ];
-  return levels.find(l => totalPoints >= l.minPoints && totalPoints <= l.maxPoints) || levels[0];
+  return (
+    ECO_LEVELS.find((l) => totalPoints >= l.minPoints && totalPoints <= l.maxPoints) ||
+    ECO_LEVELS[0]
+  );
 }
 
 export function getNextLevel(currentLevel: number) {
-  const levels = [
-    { level: 1, name: "Pemula Hijau", minPoints: 0, maxPoints: 99, badge: "🌱" },
-    { level: 2, name: "Penjaga Bumi", minPoints: 100, maxPoints: 499, badge: "🌿" },
-    { level: 3, name: "Pahlawan Daur Ulang", minPoints: 500, maxPoints: 1999, badge: "♻️" },
-    { level: 4, name: "Plastic Fighter", minPoints: 2000, maxPoints: 4999, badge: "🥤" },
-    { level: 5, name: "E-Waste Pioneer", minPoints: 5000, maxPoints: 9999, badge: "💻" },
-    { level: 6, name: "Carbon Neutral Champion", minPoints: 10000, maxPoints: Infinity, badge: "🌍" },
-  ];
-  return levels.find(l => l.level === currentLevel + 1);
+  return ECO_LEVELS.find((l) => l.level === currentLevel + 1);
 }
 
 export function compressImage(file: File, maxWidth = 1024, quality = 0.8): Promise<File> {

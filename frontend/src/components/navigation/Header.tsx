@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, Leaf, LogOut, User, Settings, Wallet } from "lucide-react";
+import { Menu, X, LogOut, User, Settings, Wallet, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -15,13 +16,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useEcoTracker } from "@/context/EcoTrackerContext";
-import { formatNumber, cn } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
 
 export function Header() {
   const { user, loading: authLoading } = useAuth();
-  const { ecoSummary, loading: ecoLoading } = useEcoTracker();
+  const { ecoSummary } = useEcoTracker();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (authLoading) {
@@ -29,7 +30,14 @@ export function Header() {
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Leaf className="h-8 w-8 text-primary" />
+            <Image
+              src="/logo.png"
+              alt="BuangYuk"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-lg object-contain"
+              priority
+            />
             <span className="font-bold text-xl text-foreground">BuangYuk</span>
           </Link>
         </div>
@@ -42,7 +50,14 @@ export function Header() {
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Leaf className="h-8 w-8 text-primary" />
+            <Image
+              src="/logo.png"
+              alt="BuangYuk"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-lg object-contain"
+              priority
+            />
             <span className="font-bold text-xl text-foreground">BuangYuk</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -68,38 +83,27 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Leaf className="h-8 w-8 text-primary" />
+          <Image
+            src="/logo.png"
+            alt="BuangYuk"
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-lg object-contain"
+            priority
+          />
           <span className="font-bold text-xl text-foreground hidden sm:block">BuangYuk</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/input-sampah"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Setor Sampah
-          </Link>
-          <Link
-            href="/carbon-tracker"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Carbon Tracker
-          </Link>
-          <Link
-            href="/edukasi"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Edukasi
-          </Link>
-        </nav>
-
         <div className="flex items-center gap-4">
+          <Link
+            href="/notifikasi"
+            className="relative p-2 rounded-full hover:bg-muted transition-colors"
+            aria-label="Notifikasi"
+          >
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" aria-hidden="true" />
+          </Link>
+
           <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm font-medium">
             <Wallet className="h-4 w-4" />
             <span>Rp {formatNumber(ecoSummary?.totalEcoPoints || 0)}</span>
@@ -131,7 +135,7 @@ export function Header() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/profil" className="flex items-center gap-2">
+                <Link href="/profil/pengaturan" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Pengaturan
                 </Link>

@@ -141,17 +141,23 @@ firebase use buang-yuk
 
 ### 3. Install Scripts Dependencies
 ```bash
-cd scripts
+cd backend
 npm install
 ```
 
 ### 4. Initialize Database
 ```bash
-# Seed waste categories only
-node scripts/init-database.js
+# From inside the backend/ folder
+cd backend
+
+# Seed waste categories only (via npm script)
+npm run db:seed-categories
+
+# Initialize DB (seed categories + optional admin)
+npm run db:init
 
 # Seed + create admin user
-node scripts/init-database.js admin@yourdomain.com
+npm run db:init -- admin@yourdomain.com
 ```
 
 ### 5. Deploy Security Rules

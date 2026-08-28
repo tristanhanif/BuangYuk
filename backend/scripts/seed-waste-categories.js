@@ -1,7 +1,7 @@
 /**
  * Seed Script: waste_categories Collection
  * 
- * Run: node scripts/seed-waste-categories.js
+ * Run: npm run db:seed-categories (from ./backend)
  * 
  * Requires: FIREBASE_SERVICE_ACCOUNT env var (path to service account JSON)
  * Or: Set GOOGLE_APPLICATION_CREDENTIALS env var
