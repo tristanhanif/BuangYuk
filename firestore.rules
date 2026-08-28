@@ -15,138 +15,284 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
     function hasRole(role) {
-      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+      return isAuthenticated() && getRole() == role;
     }
 
-    function isUser() {
-      return hasRole("USER");
-    }
-
-    function isVerifier() {
-      return hasRole("VERIFIER");
-    }
-
-    function isAdmin() {
-      return hasRole("ADMIN");
-    }
+    function isCustomer() { return hasRole("customer"); }
+    function isCollector() { return hasRole("collector"); }
+    function isBankSampah() { return hasRole("bank_sampah"); }
+    function isUMKM() { return hasRole("umkm"); }
+    function isAdmin() { return hasRole("admin"); }
 
     function isOwnerOrAdmin(userId) {
       return isOwner(userId) || isAdmin();
     }
 
     // ============================================================
-    // Collection: users
+    // users — authenticated users can read for display purposes
     // ============================================================
-    // USER: Read & Write own profile
-    // VERIFIER: Read only
-    // ADMIN: Full access
-
     match /users/{userId} {
-      // Users can read their own profile
-      allow read: if isOwnerOrAdmin(userId);
-
-      // Users can create their own profile during registration
-      allow create: if isOwner(userId)
-        && request.resource.data.keys().hasAll(["uid", "email", "fullName", "role", "createdAt", "updatedAt"])
-        && request.resource.data.role in ["USER", "VERIFIER", "ADMIN"]
-        && request.resource.data.uid == userId;
-
-      // Users can update their own profile (limited fields)
-      allow update: if isOwnerOrAdmin(userId)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(["uid", "role", "createdAt"]);
-
-      // Only admins can delete users
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwnerOrAdmin(userId);
       allow delete: if isAdmin();
     }
 
     // ============================================================
-    // Collection: user_eco_summaries
+    // user_eco_summaries
     // ============================================================
-    // USER: Read only (own summary)
-    // VERIFIER: Read only
-    // ADMIN: Full access
-    // Client Direct Write: NO (Server/Admin SDK only)
-
     match /user_eco_summaries/{userId} {
       allow read: if isOwnerOrAdmin(userId);
+      allow create: if isOwner(userId);
       allow write: if isAdmin();
     }
 
     // ============================================================
-    // Collection: waste_categories
+    // waste_categories
     // ============================================================
-    // USER: Read only
-    // VERIFIER: Read only
-    // ADMIN: Full access
-    // Client Direct Write: NO (Admin only)
-
     match /waste_categories/{categoryId} {
       allow read: if isAuthenticated();
       allow write: if isAdmin();
     }
 
     // ============================================================
-    // Collection: waste_transactions
+    // waste_transactions
     // ============================================================
-    // USER: Read own, Create draft (PENDING only)
-    // VERIFIER: Read all, Update status (verify/reject)
-    // ADMIN: Full access
-    // Client Direct Write: Conditional (PENDING draft only)
-
     match /waste_transactions/{transactionId} {
-      // Users can read their own transactions
-      // Verifiers and admins can read all
-      allow read: if isAuthenticated() && (
-        resource.data.userId == request.auth.uid
-        || isVerifier()
-        || isAdmin()
-      );
-
-      // Users can create new transactions (draft/PENDING only)
-      allow create: if isAuthenticated()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == "PENDING"
-        && request.resource.data.keys().hasAll([
-          "userId", "status", "categoryId", "subCategoryId",
-          "inputQuantity", "inputUnit", "estimatedCo2eSaved",
-          "photoProofUrl", "pickupMethod", "createdAt"
-        ]);
-
-      // Verifiers can update status and add verification data
-      // Admins can update anything
-      allow update: if isAuthenticated() && (
-        (isVerifier() && request.resource.data.status in ["VERIFIED", "REJECTED", "ADJUSTED"])
-        || isAdmin()
-      );
-
-      // Only admins can delete transactions
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
 
     // ============================================================
-    // Collection: eco_point_redemptions
+    // pickups
     // ============================================================
-    // USER: Read only (own redemptions)
-    // VERIFIER: No access
-    // ADMIN: Full access
-    // Client Direct Write: NO (Server/Admin SDK only)
+    match /pickups/{pickupId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+    }
 
+    // ============================================================
+    // pickup_events
+    // ============================================================
+    match /pickup_events/{eventId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // collectors
+    // ============================================================
+    match /collectors/{collectorId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(collectorId) || isAdmin();
+    }
+
+    // ============================================================
+    // collector_locations
+    // ============================================================
+    match /collector_locations/{locationId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // collector_earnings
+    // ============================================================
+    match /collector_earnings/{earningId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(resource.data.collectorId) || isAdmin();
+      allow update: if isAdmin();
+    }
+
+    // ============================================================
+    // waste_banks
+    // ============================================================
+    match /waste_banks/{bankId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(bankId) || isAdmin();
+    }
+
+    // ============================================================
+    // waste_bank_settlements
+    // ============================================================
+    match /waste_bank_settlements/{settlementId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+    }
+
+    // ============================================================
+    // wallets — owner can read, system creates, admin writes
+    // ============================================================
+    match /wallets/{walletId} {
+      allow read: if isOwnerOrAdmin(walletId);
+      allow create: if isOwner(walletId);
+      allow update: if isOwnerOrAdmin(walletId);
+    }
+
+    // ============================================================
+    // wallet_transactions — owner can read & create (cashout, spending)
+    // ============================================================
+    match /wallet_transactions/{txnId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // cashout_requests — owner can create and read own
+    // ============================================================
+    match /cashout_requests/{requestId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+    }
+
+    // ============================================================
+    // eco_points — eco points ledger (earning & redemption)
+    // ============================================================
+    match /eco_points/{entryId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // eco_point_redemptions
+    // ============================================================
     match /eco_point_redemptions/{redemptionId} {
-      allow read: if isAuthenticated() && (
-        resource.data.userId == request.auth.uid
-        || isAdmin()
-      );
+      allow read: if isAuthenticated();
       allow write: if isAdmin();
     }
 
     // ============================================================
-    // Collection: audit_logs
+    // marketplace_products
     // ============================================================
-    // All client roles: No access (System Internal only)
+    match /marketplace_products/{productId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+    }
 
+    // ============================================================
+    // marketplace_orders
+    // ============================================================
+    match /marketplace_orders/{orderId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+    }
+
+    // ============================================================
+    // disputes
+    // ============================================================
+    match /disputes/{disputeId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() || isAdmin();
+    }
+
+    // ============================================================
+    // fraud_flags
+    // ============================================================
+    match /fraud_flags/{flagId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+    }
+
+    // ============================================================
+    // notifications
+    // ============================================================
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // pricing_configs
+    // ============================================================
+    match /pricing_configs/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // matching_configs
+    // ============================================================
+    match /matching_configs/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // carbon_factors
+    // ============================================================
+    match /carbon_factors/{factorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // audit_logs — IMMUTABLE but allow authenticated create for own
+    // ============================================================
     match /audit_logs/{logId} {
-      allow read, write: if false;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // bank_capacity — daily capacity tracking per bank
+    // ============================================================
+    match /bank_capacity/{capacityId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+    }
+
+    // ============================================================
+    // configs (system config)
+    // ============================================================
+    match /configs/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // fcm_tokens
+    // ============================================================
+    match /fcm_tokens/{tokenDocId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // ============================================================
+    // regions
+    // ============================================================
+    match /regions/{regionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // materials (alias for waste_categories in seed)
+    // ============================================================
+    match /materials/{materialId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }

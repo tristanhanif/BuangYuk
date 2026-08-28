@@ -37,7 +37,7 @@ export function QuickActionGrid({ className }: QuickActionGridProps) {
       iconColor: "text-emerald-600",
     },
     {
-      href: "/profil",
+      href: "/eco-redeem",
       icon: Gift,
       label: "Tukar Poin",
       desc: "Tukar Eco-Points jadi voucher/hadiah",

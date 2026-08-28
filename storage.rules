@@ -76,5 +76,29 @@ service firebase.storage {
       allow delete: if isOwner(userId)
         || request.auth.token.admin == true;
     }
+
+    // ============================================================
+    // Pickup Proof & Verification Photos: /pickups/{userId}/{path}
+    // ============================================================
+    match /pickups/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId)
+        && isValidImage()
+        && isUnderSizeLimit(5);
+      allow update: if false;
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // ============================================================
+    // Marketplace Product Photos: /marketplace/{sellerId}/{path}
+    // ============================================================
+    match /marketplace/{sellerId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(sellerId)
+        && isValidImage()
+        && isUnderSizeLimit(10);
+      allow update: if isOwner(sellerId);
+      allow delete: if isOwner(sellerId) || isAdmin();
+    }
   }
 }

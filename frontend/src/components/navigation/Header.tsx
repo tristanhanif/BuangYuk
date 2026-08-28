@@ -49,7 +49,7 @@ export function Header() {
             <Link href="/login">
               <Button variant="ghost">Masuk</Button>
             </Link>
-            <Link href="/register">
+            <Link href="/register-role">
               <Button>Daftar</Button>
             </Link>
           </div>
@@ -64,39 +64,48 @@ export function Header() {
     .join("")
     .toUpperCase() || "U";
 
+  // Determine dashboard link based on user profile role
+  const userRole = (user as any)?.role || "customer";
+  const dashboardLink = userRole === "collector" ? "/collector" : userRole === "admin" ? "/admin" : userRole === "bank_sampah" ? "/bank-sampah" : userRole === "umkm" ? "/umkm" : "/dashboard";
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href={dashboardLink} className="flex items-center gap-2">
           <Leaf className="h-8 w-8 text-primary" />
           <span className="font-bold text-xl text-foreground hidden sm:block">BuangYuk</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <Link href={dashboardLink} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Dashboard
           </Link>
-          <Link
-            href="/input-sampah"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Setor Sampah
-          </Link>
-          <Link
-            href="/carbon-tracker"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Carbon Tracker
-          </Link>
-          <Link
-            href="/edukasi"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Edukasi
-          </Link>
+          {userRole === "customer" && (
+            <>
+              <Link href="/input-sampah" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Setor Sampah
+              </Link>
+              <Link href="/wallet" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Wallet
+              </Link>
+              <Link href="/marketplace" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Marketplace
+              </Link>
+              <Link href="/disputes" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Disputes
+              </Link>
+            </>
+          )}
+          {userRole === "collector" && (
+            <>
+              <Link href="/collector/earnings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Earnings
+              </Link>
+              <Link href="/riwayat" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                History
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="flex items-center gap-4">
@@ -162,34 +171,28 @@ export function Header() {
       {mobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden border-t border-border bg-background py-4">
           <nav className="flex flex-col gap-2 px-4">
-            <Link
-              href="/dashboard"
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
+            <Link href="/dashboard" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               Dashboard
             </Link>
-            <Link
-              href="/input-sampah"
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
+            <Link href="/input-sampah" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               Setor Sampah
             </Link>
-            <Link
-              href="/carbon-tracker"
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
+            <Link href="/wallet" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
+              Wallet
+            </Link>
+            <Link href="/marketplace" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
+              Marketplace
+            </Link>
+            <Link href="/disputes" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
+              Disputes
+            </Link>
+            <Link href="/carbon-tracker" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               Carbon Tracker
             </Link>
-            <Link
-              href="/edukasi"
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
+            <Link href="/edukasi" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               Edukasi
             </Link>
-            <Link
-              href="/profil"
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
+            <Link href="/profil" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               Profil
             </Link>
           </nav>
