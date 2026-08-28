@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/lib/firebaseClient";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { WASTE_CATEGORIES } from "@/lib/constants";
-import { formatCurrency, formatNumber, formatDate, calculateCO2Saved, calculateEarnings, calculatePoints } from "@/lib/utils";
+import { formatCurrency, formatNumber, formatDate, calculateCO2Saved, calculateEarnings, calculatePoints, validateTransactionItem, validateTotalWeight, co2Comparator, AnomalyFlag } from "@/lib/utils";
 import { Transaction } from "@/types/transaction";
 import {
   ArrowLeft,
@@ -26,6 +26,7 @@ import {
   Store,
   Loader2,
   Info,
+  AlertCircle,
 } from "lucide-react";
 
 export default function VerificationPage() {
@@ -40,6 +41,7 @@ export default function VerificationPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [anomalyFlags, setAnomalyFlags] = useState<{ itemIndex: number; flags: AnomalyFlag[] }[]>([]);
 
   useEffect(() => {
     const fetchTransaction = async () => {
@@ -123,12 +125,62 @@ export default function VerificationPage() {
             : "Transaksi berhasil disetujui!"
         );
       }
-    } catch {
-      alert("Gagal memproses verifikasi. Silakan coba lagi.");
+    } catch (err) {
+      console.error("Verification error:", err);
+      const message = err instanceof Error ? err.message : "Gagal memproses verifikasi. Silakan coba lagi.";
+      alert(message);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Computed values & hooks (must be before early returns for Rules of Hooks)
+  const verifiedWeight = parseFloat(actualWeight) || 0;
+  const weightDiff = transaction?.totalWeightKg ? verifiedWeight - transaction.totalWeightKg : 0;
+  const weightDiffPercent = transaction?.totalWeightKg
+    ? Math.abs(weightDiff) / transaction.totalWeightKg * 100
+    : 0;
+  const hasSignificantDiff = weightDiffPercent > 10;
+
+  // Anomaly detection on actual weight input
+  useEffect(() => {
+    if (!actualWeight || !transaction?.items) {
+      setAnomalyFlags([]);
+      return;
+    }
+    const weight = parseFloat(actualWeight);
+    if (isNaN(weight) || weight <= 0) {
+      setAnomalyFlags([]);
+      return;
+    }
+
+    const flags = transaction.items.map((item, idx) => ({
+      itemIndex: idx,
+      flags: validateTransactionItem(item.categoryId, weight * (item.weightKg / (transaction?.totalWeightKg || 1)), item.unit as "kg" | "pcs", item.quantity),
+    })).filter(f => f.flags.length > 0);
+
+    const totalFlags = validateTotalWeight(weight);
+    if (totalFlags.length > 0) {
+      flags.push({ itemIndex: -1, flags: totalFlags });
+    }
+
+    setAnomalyFlags(flags);
+  }, [actualWeight, transaction?.items, transaction?.totalWeightKg]);
+
+  const recalculated = useMemo(() => {
+    if (!transaction) return { earnings: 0, co2: 0, points: 0 };
+    let earnings = 0;
+    let co2 = 0;
+    let points = 0;
+    transaction.items?.forEach((item) => {
+      const ratio = transaction.totalWeightKg > 0 ? item.weightKg / transaction.totalWeightKg : 0;
+      const itemWeight = verifiedWeight * ratio;
+      earnings += calculateEarnings(item.categoryId, itemWeight);
+      co2 += calculateCO2Saved(item.categoryId, itemWeight);
+      points += calculatePoints(item.categoryId, itemWeight);
+    });
+    return { earnings, co2, points: Math.round(points) };
+  }, [transaction, verifiedWeight]);
 
   if (authLoading || loading) {
     return (
@@ -182,27 +234,6 @@ export default function VerificationPage() {
       </div>
     );
   }
-
-  const verifiedWeight = parseFloat(actualWeight) || 0;
-  const weightDiff = verifiedWeight - transaction.totalWeightKg;
-  const weightDiffPercent = transaction.totalWeightKg > 0
-    ? Math.abs(weightDiff) / transaction.totalWeightKg * 100
-    : 0;
-  const hasSignificantDiff = weightDiffPercent > 10;
-
-  const recalculated = (() => {
-    let earnings = 0;
-    let co2 = 0;
-    let points = 0;
-    transaction.items?.forEach((item) => {
-      const ratio = transaction.totalWeightKg > 0 ? item.weightKg / transaction.totalWeightKg : 0;
-      const itemWeight = verifiedWeight * ratio;
-      earnings += calculateEarnings(item.categoryId, itemWeight);
-      co2 += calculateCO2Saved(item.categoryId, itemWeight);
-      points += calculatePoints(item.categoryId, itemWeight);
-    });
-    return { earnings, co2, points: Math.round(points) };
-  })();
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -329,7 +360,7 @@ export default function VerificationPage() {
       )}
 
       {/* Verification Form */}
-      {transaction.status === "PENDING" && (
+      {(transaction.status === "PENDING" || transaction.status === "VERIFIED") && (
         <Card className="border-amber-200">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">

@@ -15,7 +15,7 @@ const userNavItems = [
 
 const verifierNavItems = [
   { href: "/scan", label: "Scan QR", icon: QrCode },
-  { href: "/scan", label: "Verifikasi", icon: ScanLine },
+  { href: "/verifikasi", label: "Verifikasi", icon: ScanLine },
 ];
 
 interface NavLinkProps {

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -29,6 +29,7 @@ import {
   CheckCircle2,
   XCircle,
   Truck,
+  Package,
   Filter,
   Inbox,
 } from "lucide-react";
@@ -41,13 +42,17 @@ const STATUS_CONFIG: Record<string, { label: string; variant: "success" | "warni
 };
 
 export default function RiwayatPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const q = query(
       collection(db, "transactions"),
@@ -70,7 +75,7 @@ export default function RiwayatPage() {
     return () => unsubscribe();
   }, [user]);
 
-  if (authLoading || (user && loading)) {
+  if (authLoading || loading) {
     return (
       <div className="space-y-4 animate-pulse">
         <div className="h-8 bg-muted rounded w-1/4" />
@@ -133,9 +138,9 @@ export default function RiwayatPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Mulai setor sampah untuk melihat riwayat transaksimu
             </p>
-            <Link href="/input-sampah" className={buttonVariants()}>
+            <Button onClick={() => router.push("/input-sampah")}>
               Setor Sampah Sekarang
-            </Link>
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -166,7 +171,7 @@ export default function RiwayatPage() {
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground font-mono">
-                      #{txn.id.slice(0, 12)}
+                      #{txn.id}
                     </p>
                   </div>
 
@@ -198,13 +203,12 @@ export default function RiwayatPage() {
                   <div className="flex flex-wrap gap-2">
                     {txn.items?.map((item, idx) => {
                       const cat = WASTE_CATEGORIES.find((c) => c.id === item.categoryId);
-                      const CatIcon = cat?.icon;
                       return (
                         <span
                           key={idx}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs"
                         >
-                          {CatIcon && <CatIcon className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />} {cat?.label} ({item.weightKg.toFixed(1)} kg)
+                          {cat?.icon} {cat?.label} ({item.weightKg.toFixed(1)} kg)
                         </span>
                       );
                     })}
