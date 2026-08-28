@@ -91,7 +91,7 @@ export function Header() {
             className="h-8 w-8 rounded-lg object-contain"
             priority
           />
-          <span className="font-bold text-xl text-foreground hidden sm:block">BuangYuk</span>
+          <span className="font-bold text-xl text-foreground hidden sm:block text-green-600">BuangYuk</span>
         </Link>
 
         <div className="flex items-center gap-4">
