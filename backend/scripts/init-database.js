@@ -6,7 +6,7 @@
  * 2. Initial admin user (optional)
  * 3. Database structure verification
  * 
- * Run: node scripts/init-database.js [admin-email]
+ * Run: npm run db:init (from ./backend) [admin-email]
  * 
  * Requires: FIREBASE_SERVICE_ACCOUNT env var or GOOGLE_APPLICATION_CREDENTIALS
  */
@@ -164,7 +164,7 @@ async function main() {
     console.log("   1. Deploy security rules: firebase deploy --only firestore:rules");
     console.log("   2. Deploy indexes: firebase deploy --only firestore:indexes");
     console.log("   3. Deploy storage rules: firebase deploy --only storage");
-    console.log(`   4. Run: node scripts/init-database.js admin@yourdomain.com`);
+    console.log(`   4. Run: npm run db:init -- admin@yourdomain.com (from ./backend)`);
     console.log("");
 
     process.exit(0);

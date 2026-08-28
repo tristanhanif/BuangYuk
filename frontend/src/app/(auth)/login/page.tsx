@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Leaf, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
@@ -71,12 +72,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 text-green-600 mx-auto mb-4">
-            <Leaf className="h-7 w-7" />
-          </div>
+          <Link href="/" className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-sm ring-1 ring-border mx-auto mb-4">
+            <Image
+              src="/logo.png"
+              alt="BuangYuk"
+              width={48}
+              height={48}
+              className="object-contain"
+              priority
+            />
+          </Link>
           <CardTitle className="text-2xl">Masuk ke BuangYuk</CardTitle>
           <CardDescription>
             Selamat datang kembali! Masukkan akun Anda untuk melanjutkan.

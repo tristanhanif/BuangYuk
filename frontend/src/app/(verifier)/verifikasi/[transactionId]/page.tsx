@@ -281,10 +281,11 @@ export default function VerificationPage() {
         <CardContent className="space-y-3">
           {transaction.items?.map((item, idx) => {
             const cat = WASTE_CATEGORIES.find((c) => c.id === item.categoryId);
+            const CatIcon = cat?.icon;
             return (
               <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{cat?.icon}</span>
+                  {CatIcon && <CatIcon className="h-5 w-5 text-primary" aria-hidden="true" />}
                   <div>
                     <p className="font-medium text-sm">{cat?.label || item.categoryLabel}</p>
                     <p className="text-xs text-muted-foreground">
