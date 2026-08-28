@@ -104,10 +104,13 @@ export function Header() {
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" aria-hidden="true" />
           </Link>
 
-          <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm font-medium">
+          <Link
+            href="/saldo"
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm font-medium transition-colors hover:bg-green-100"
+          >
             <Wallet className="h-4 w-4" />
             <span>Rp {formatNumber(ecoSummary?.totalEcoPoints || 0)}</span>
-          </div>
+          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -132,6 +135,12 @@ export function Header() {
                 <Link href="/profil" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Profil
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/saldo" className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4" />
+                  Saldo & Dompet
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
