@@ -117,7 +117,7 @@ service cloud.firestore {
       // Verifiers can update status and add verification data
       // Admins can update anything
       allow update: if isAuthenticated() && (
-        (isVerifier() && request.resource.data.status in ["VERIFIED", "REJECTED", "ADJUSTED"])
+        (isVerifier() && request.resource.data.status in ["VERIFIED", "REJECTED", "ADJUSTED", "COMPLETED"])
         || isAdmin()
       );
 

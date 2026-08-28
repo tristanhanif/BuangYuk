@@ -359,7 +359,7 @@ export default function VerificationPage() {
       )}
 
       {/* Verification Form */}
-      {transaction.status === "PENDING" && (
+      {(transaction.status === "PENDING" || transaction.status === "VERIFIED") && (
         <Card className="border-amber-200">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">

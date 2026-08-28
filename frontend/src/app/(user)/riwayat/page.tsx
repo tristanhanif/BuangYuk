@@ -171,7 +171,7 @@ export default function RiwayatPage() {
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground font-mono">
-                      #{txn.id.slice(0, 12)}
+                      #{txn.id}
                     </p>
                   </div>
 

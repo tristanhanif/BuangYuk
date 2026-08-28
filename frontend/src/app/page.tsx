@@ -22,7 +22,7 @@ export default function Home() {
               dan gamifikasi ekologi. Setor sampah, dapatkan uang & poin, lihat dampak karbonmu.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/register">
+              <Link href="/login">
                 <Button size="xl" className="gap-2">
                   Mulai Sekarang <ArrowRight className="h-4 w-4" />
                 </Button>
