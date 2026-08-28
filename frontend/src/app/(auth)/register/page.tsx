@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -9,8 +9,9 @@ import { z } from "zod";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
-  signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider,
+  getRedirectResult,
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebaseClient";
@@ -49,6 +50,46 @@ export default function RegisterPage() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
+
+  // Handle redirect result on page load
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const user = result.user;
+          console.log("Redirect auth success:", user.uid);
+
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || "Pengguna",
+            photoURL: user.photoURL,
+            phoneNumber: null,
+            role: "user",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+
+          await setDoc(doc(db, "user_eco_summaries", user.uid), {
+            userId: user.uid,
+            totalCO2Saved: 0,
+            totalEcoPoints: 0,
+            totalTransactions: 0,
+            wasteBreakdown: {},
+            monthlyCO2Trend: [],
+            lastUpdated: serverTimestamp(),
+          });
+
+          router.push("/dashboard");
+        }
+      } catch (err) {
+        console.error("Redirect error:", err);
+        setError("Gagal mendaftar dengan Google. Silakan coba lagi.");
+      }
+    };
+    handleRedirect();
+  }, [router]);
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
@@ -97,34 +138,14 @@ export default function RegisterPage() {
     setError(null);
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || "Pengguna",
-        photoURL: user.photoURL,
-        phoneNumber: null,
-        role: "user",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-
-      await setDoc(doc(db, "user_eco_summaries", user.uid), {
-        userId: user.uid,
-        totalCO2Saved: 0,
-        totalEcoPoints: 0,
-        totalTransactions: 0,
-        wasteBreakdown: {},
-        monthlyCO2Trend: [],
-        lastUpdated: serverTimestamp(),
-      });
-
-      router.push("/dashboard");
-    } catch {
-      setError("Gagal mendaftar dengan Google. Silakan coba lagi.");
-    } finally {
+      // Use redirect instead of popup (more reliable, works on mobile)
+      await signInWithRedirect(auth, provider);
+      // Page will redirect to Google, then back here
+      // The useEffect above handles the result
+    } catch (err) {
+      console.error("Google register error:", err);
+      const message = err instanceof Error ? err.message : "Gagal mendaftar dengan Google. Silakan coba lagi.";
+      setError(message);
       setIsLoading(false);
     }
   };

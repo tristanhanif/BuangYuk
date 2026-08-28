@@ -43,8 +43,8 @@ service cloud.firestore {
     // ADMIN: Full access
 
     match /users/{userId} {
-      // Users can read their own profile
-      allow read: if isOwnerOrAdmin(userId);
+      // Users can read their own profile (for role checking in hasRole())
+      allow read: if isOwner(userId) || isAdmin();
 
       // Users can create their own profile during registration
       allow create: if isOwner(userId)
@@ -87,14 +87,14 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // Collection: waste_transactions
+    // Collection: transactions
     // ============================================================
     // USER: Read own, Create draft (PENDING only)
     // VERIFIER: Read all, Update status (verify/reject)
     // ADMIN: Full access
     // Client Direct Write: Conditional (PENDING draft only)
 
-    match /waste_transactions/{transactionId} {
+    match /transactions/{transactionId} {
       // Users can read their own transactions
       // Verifiers and admins can read all
       allow read: if isAuthenticated() && (
@@ -108,9 +108,10 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.status == "PENDING"
         && request.resource.data.keys().hasAll([
-          "userId", "status", "categoryId", "subCategoryId",
-          "inputQuantity", "inputUnit", "estimatedCo2eSaved",
-          "photoProofUrl", "pickupMethod", "createdAt"
+          "userId", "userName", "userEmail", "items",
+          "pickupMethod", "photos", "notes", "status",
+          "totalWeightKg", "totalEarnings", "totalCO2Saved", "totalPoints",
+          "createdAt", "updatedAt"
         ]);
 
       // Verifiers can update status and add verification data

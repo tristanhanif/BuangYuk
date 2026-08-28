@@ -34,6 +34,7 @@ export function EcoTrackerProvider({ children }: { children: ReactNode }) {
           lastUpdated: data.lastUpdated?.toDate() || new Date(),
         } as EcoSummary);
       } else {
+        // Document doesn't exist yet - create default
         setEcoSummary({
           userId: user.uid,
           totalCO2Saved: 0,
@@ -44,6 +45,19 @@ export function EcoTrackerProvider({ children }: { children: ReactNode }) {
           lastUpdated: new Date(),
         });
       }
+      setLoading(false);
+    }, (error) => {
+      console.error("EcoTracker snapshot error:", error);
+      // Permission denied or other error - use defaults
+      setEcoSummary({
+        userId: user.uid,
+        totalCO2Saved: 0,
+        totalEcoPoints: 0,
+        totalTransactions: 0,
+        wasteBreakdown: {},
+        monthlyCO2Trend: [],
+        lastUpdated: new Date(),
+      });
       setLoading(false);
     });
 

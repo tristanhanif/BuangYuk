@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { WASTE_CATEGORIES, VALIDATION_RULES, type WasteCategory } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -42,67 +43,112 @@ export function formatRelativeTime(date: Date | string): string {
   return formatDate(d);
 }
 
-export function calculateCO2Saved(category: string, weightKg: number): number {
-  const factors: Record<string, number> = {
-    "kertas": 3.3,
-    "karton": 3.3,
-    "plastik-pet": 2.5,
-    "plastik-hdpe": 1.8,
-    "plastik-pp": 1.8,
-    "plastik-ldpe": 1.8,
-    "plastik-campur": 1.5,
-    "logam-aluminium": 8.8,
-    "logam-besi": 1.7,
-    "logam-kaca": 0.3,
-    "e-waste-portabel": 1.2,
-    "cpu": 1.5,
-    "layar": 0.8,
-    "kabel": 2.1,
-    "baterai": 4.5,
-  };
-  return weightKg * (factors[category] || 0);
+function getCategory(categoryId: string): WasteCategory | undefined {
+  return WASTE_CATEGORIES.find(c => c.id === categoryId);
 }
 
-export function calculateEarnings(category: string, weightKg: number): number {
-  const prices: Record<string, number> = {
-    "kertas": 2000,
-    "karton": 1800,
-    "plastik-pet": 4000,
-    "plastik-hdpe": 5000,
-    "plastik-pp": 3500,
-    "plastik-ldpe": 2500,
-    "plastik-campur": 1500,
-    "logam-aluminium": 15000,
-    "logam-besi": 3000,
-    "logam-kaca": 500,
-    "e-waste-portabel": 25000,
-    "cpu": 50000,
-    "layar": 30000,
-    "kabel": 20000,
-    "baterai": 10000,
-  };
-  return weightKg * (prices[category] || 0);
+export function calculateCO2Saved(categoryId: string, weightKg: number): number {
+  const cat = getCategory(categoryId);
+  return weightKg * (cat?.co2Factor || 0);
 }
 
-export function calculatePoints(category: string, weightKg: number): number {
-  const points: Record<string, number> = {
-    "kertas": 10,
-    "karton": 10,
-    "plastik-pet": 15,
-    "plastik-hdpe": 15,
-    "plastik-pp": 12,
-    "plastik-ldpe": 10,
-    "plastik-campur": 8,
-    "logam-aluminium": 50,
-    "logam-besi": 20,
-    "logam-kaca": 5,
-    "e-waste-portabel": 100,
-    "cpu": 200,
-    "layar": 150,
-    "kabel": 80,
-    "baterai": 50,
-  };
-  return Math.round(weightKg * (points[category] || 0));
+export function calculateEarnings(categoryId: string, weightKg: number): number {
+  const cat = getCategory(categoryId);
+  return Math.round(weightKg * (cat?.pricePerKg || 0));
+}
+
+export function calculatePoints(categoryId: string, weightKg: number): number {
+  const cat = getCategory(categoryId);
+  return Math.round(weightKg * (cat?.pointsPerKg || 0));
+}
+
+export interface AnomalyFlag {
+  type: "weight" | "density" | "price" | "category";
+  severity: "warning" | "error";
+  message: string;
+  field?: string;
+}
+
+export function validateTransactionItem(
+  categoryId: string,
+  weightKg: number,
+  unit: "kg" | "pcs",
+  quantity: number
+): AnomalyFlag[] {
+  const flags: AnomalyFlag[] = [];
+  const cat = getCategory(categoryId);
+  const rules = VALIDATION_RULES;
+
+  if (!cat) {
+    flags.push({
+      type: "category",
+      severity: "error",
+      message: `Kategori tidak dikenal: ${categoryId}`,
+      field: "categoryId",
+    });
+    return flags;
+  }
+
+  if (weightKg < rules.minWeightKg) {
+    flags.push({
+      type: "weight",
+      severity: "error",
+      message: `Berat terlalu kecil: ${weightKg} kg (min ${rules.minWeightKg} kg)`,
+      field: "weightKg",
+    });
+  }
+
+  if (weightKg > rules.maxSingleItemWeightKg) {
+    flags.push({
+      type: "weight",
+      severity: "warning",
+      message: `Berat item melebihi batas normal: ${weightKg} kg (max ${rules.maxSingleItemWeightKg} kg)`,
+      field: "weightKg",
+    });
+  }
+
+  if (cat.unit === "pcs" && cat.typicalWeightPerPcsKg) {
+    const expectedWeight = quantity * cat.typicalWeightPerPcsKg;
+    const diffPercent = Math.abs(weightKg - expectedWeight) / expectedWeight * 100;
+    if (diffPercent > rules.densityTolerancePercent) {
+      flags.push({
+        type: "density",
+        severity: "warning",
+        message: `Berat tidak sesuai estimasi: ${weightKg.toFixed(3)} kg vs ~${expectedWeight.toFixed(3)} kg (${diffPercent.toFixed(0)}% selisih)`,
+        field: "weightKg",
+      });
+    }
+  }
+
+  if (cat.densityKgPerM3 && unit === "kg") {
+    const volumeM3 = weightKg / cat.densityKgPerM3;
+    if (volumeM3 > 10) {
+      flags.push({
+        type: "density",
+        severity: "warning",
+        message: `Volume sangat besar: ${volumeM3.toFixed(1)} m³ untuk ${weightKg} kg ${cat.label}`,
+        field: "weightKg",
+      });
+    }
+  }
+
+  return flags;
+}
+
+export function validateTotalWeight(totalWeightKg: number): AnomalyFlag[] {
+  const flags: AnomalyFlag[] = [];
+  const rules = VALIDATION_RULES;
+
+  if (totalWeightKg > rules.maxTotalWeightKg) {
+    flags.push({
+      type: "weight",
+      severity: "warning",
+      message: `Total berat transaksi melebihi batas normal: ${totalWeightKg} kg (max ${rules.maxTotalWeightKg} kg)`,
+      field: "totalWeightKg",
+    });
+  }
+
+  return flags;
 }
 
 export function getEcoLevel(totalPoints: number) {
@@ -173,4 +219,12 @@ export function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn(...args), delay);
   };
+}
+
+export function co2Comparator(kgCO2: number): string {
+  const trees = (kgCO2 / 22).toFixed(1);
+  const kwh = (kgCO2 / 2.38).toFixed(1);
+  const kmCar = (kgCO2 / 2.2).toFixed(1);
+  const literPetrol = (kgCO2 / 2.3).toFixed(2);
+  return `≈ ${trees} pohon-tahun | ${kwh} kWh listrik | ${kmCar} km mobil | ${literPetrol} L bensin`;
 }

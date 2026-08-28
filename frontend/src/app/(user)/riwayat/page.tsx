@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,7 @@ const STATUS_CONFIG: Record<string, { label: string; variant: "success" | "warni
 };
 
 export default function RiwayatPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,8 +138,8 @@ export default function RiwayatPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Mulai setor sampah untuk melihat riwayat transaksimu
             </p>
-            <Button asChild>
-              <a href="/input-sampah">Setor Sampah Sekarang</a>
+            <Button onClick={() => router.push("/input-sampah")}>
+              Setor Sampah Sekarang
             </Button>
           </CardContent>
         </Card>

@@ -12,6 +12,7 @@ import { useWasteCalculator } from "@/hooks/useWasteCalculator";
 import { useAuth } from "@/hooks/useAuth";
 import { WASTE_CATEGORIES, PICKUP_METHODS, UNIT_CONVERSIONS } from "@/lib/constants";
 import { formatCurrency, formatNumber, compressImage, cn } from "@/lib/utils";
+import { uploadMultipleToCloudinary } from "@/lib/cloudinary";
 import {
   ArrowLeft,
   ArrowRight,
@@ -25,8 +26,7 @@ import {
   Store,
   Loader2,
 } from "lucide-react";
-import { db, storage } from "@/lib/firebaseClient";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db } from "@/lib/firebaseClient";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const STEPS = ["Pilih Material", "Input Kuantitas", "Estimasi", "Unggah & Kirim"];
@@ -52,6 +52,7 @@ export function WasteInputForm() {
     setSelectedCategory(categoryId);
     const cat = WASTE_CATEGORIES.find((c) => c.id === categoryId);
     if (cat) setUnit(cat.unit === "pcs" ? "pcs" : "kg");
+    setCurrentStep(2); // Auto-advance to Input Kuantitas
   }, []);
 
   const handleAddItem = useCallback(() => {
@@ -80,20 +81,27 @@ export function WasteInputForm() {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+
   const handleSubmit = useCallback(async () => {
     if (!user || items.length === 0) return;
     setIsSubmitting(true);
+    setUploadProgress({ current: 0, total: photos.length });
 
     try {
-      const photoUrls: string[] = [];
-      for (const photo of photos) {
-        const storageRef = ref(storage, `waste-submissions/${user.uid}/${Date.now()}-${photo.name}`);
-        await uploadBytes(storageRef, photo);
-        const url = await getDownloadURL(storageRef);
-        photoUrls.push(url);
-      }
+      console.log("Starting submission...", { itemsCount: items.length, photosCount: photos.length });
 
-      await addDoc(collection(db, "transactions"), {
+      const photoUrls = photos.length > 0
+        ? await uploadMultipleToCloudinary(photos, `waste-submissions/${user.uid}`, (current, total) => {
+            setUploadProgress({ current, total });
+            console.log(`Upload progress: ${current}/${total}`);
+          })
+        : [];
+
+      console.log("Photos uploaded:", photoUrls);
+      console.log("Writing to Firestore...");
+
+      const docRef = await addDoc(collection(db, "transactions"), {
         userId: user.uid,
         userName: user.displayName || "Pengguna",
         userEmail: user.email,
@@ -119,14 +127,25 @@ export function WasteInputForm() {
         updatedAt: serverTimestamp(),
       });
 
+      console.log("Transaction saved to Firestore, doc ID:", docRef.id);
+
       clearItems();
       setPhotos([]);
       setNotes("");
+      setUploadProgress(null);
+      console.log("Redirecting to /riwayat...");
       router.push("/riwayat");
-    } catch {
-      alert("Gagal mengirim transaksi. Silakan coba lagi.");
+      // Fallback jika router.push tidak jalan
+      setTimeout(() => {
+        if (typeof window !== "undefined") window.location.href = "/riwayat";
+      }, 1000);
+    } catch (err) {
+      console.error("Submission error:", err);
+      const message = err instanceof Error ? err.message : "Gagal mengirim transaksi. Silakan coba lagi.";
+      alert(message);
     } finally {
       setIsSubmitting(false);
+      setUploadProgress(null);
     }
   }, [user, items, photos, pickupMethod, notes, totals, clearItems, router]);
 
@@ -475,7 +494,7 @@ export function WasteInputForm() {
       </div>
 
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
+        <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1" disabled={isSubmitting}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Kembali
         </Button>
@@ -487,7 +506,11 @@ export function WasteInputForm() {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Mengirim...
+              {uploadProgress ? (
+                `Mengunggah ${uploadProgress.current}/${uploadProgress.total}...`
+              ) : (
+                "Menyimpan..."
+              )}
             </>
           ) : (
             <>
@@ -497,6 +520,20 @@ export function WasteInputForm() {
           )}
         </Button>
       </div>
+      {uploadProgress && (
+        <div className="mt-3">
+          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+            <span>Mengunggah foto...</span>
+            <span>{uploadProgress.current}/{uploadProgress.total}</span>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 

@@ -21,6 +21,14 @@ export function QuickActionGrid({ className }: QuickActionGridProps) {
       iconColor: "text-green-600",
     },
     {
+      href: "/riwayat",
+      icon: Search,
+      label: "Riwayat",
+      desc: "Lihat status transaksi & verifikasi",
+      color: "bg-blue-50 text-blue-600 hover:bg-blue-100",
+      iconColor: "text-blue-600",
+    },
+    {
       href: "/carbon-tracker",
       icon: TrendingUp,
       label: "Carbon Tracker",

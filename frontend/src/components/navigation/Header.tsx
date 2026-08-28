@@ -18,13 +18,19 @@ import { useEcoTracker } from "@/context/EcoTrackerContext";
 import { formatNumber, cn } from "@/lib/utils";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
+import { useUserRole } from "@/hooks/useUserRole";
+import { QrCode, ClipboardList } from "lucide-react";
 
 export function Header() {
   const { user, loading: authLoading } = useAuth();
   const { ecoSummary, loading: ecoLoading } = useEcoTracker();
+  const { role, loading: roleLoading } = useUserRole();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  if (authLoading) {
+  const isVerifier = role === "VERIFIER";
+  const isAdmin = role === "ADMIN";
+
+  if (authLoading || roleLoading) {
     return (
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -67,43 +73,70 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href={isVerifier ? "/dashboard" : "/dashboard"} className="flex items-center gap-2">
           <Leaf className="h-8 w-8 text-primary" />
           <span className="font-bold text-xl text-foreground hidden sm:block">BuangYuk</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/input-sampah"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Setor Sampah
-          </Link>
-          <Link
-            href="/carbon-tracker"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Carbon Tracker
-          </Link>
-          <Link
-            href="/edukasi"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Edukasi
-          </Link>
+          {isVerifier ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/scan"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Scan QR
+              </Link>
+              <Link
+                href="/verifikasi"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Verifikasi
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/input-sampah"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Setor Sampah
+              </Link>
+              <Link
+                href="/carbon-tracker"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Carbon Tracker
+              </Link>
+              <Link
+                href="/edukasi"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Edukasi
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm font-medium">
-            <Wallet className="h-4 w-4" />
-            <span>Rp {formatNumber(ecoSummary?.totalEcoPoints || 0)}</span>
-          </div>
+          {!isVerifier && (
+            <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm font-medium">
+              <Wallet className="h-4 w-4" />
+              <span>Rp {formatNumber(ecoSummary?.totalEcoPoints || 0)}</span>
+            </div>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

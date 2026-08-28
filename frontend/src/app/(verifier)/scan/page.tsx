@@ -34,8 +34,17 @@ export default function ScanPage() {
     setError(null);
 
     try {
-      const txnRef = doc(db, "transactions", transactionId.trim());
+      // Strip # prefix if user entered it (UI shows #TXN-xxx but Firestore ID is without #)
+      const cleanId = transactionId.trim().replace(/^#/, "");
+      console.log("Searching transaction:", cleanId);
+      
+      const txnRef = doc(db, "transactions", cleanId);
       const txnSnap = await getDoc(txnRef);
+
+      console.log("Transaction exists:", txnSnap.exists());
+      if (txnSnap.exists()) {
+        console.log("Transaction data:", txnSnap.data());
+      }
 
       if (!txnSnap.exists()) {
         setError("Transaksi tidak ditemukan. Pastikan ID transaksi benar.");
@@ -50,8 +59,9 @@ export default function ScanPage() {
         return;
       }
 
-      router.push(`/verifikasi/${transactionId.trim()}`);
-    } catch {
+      router.push(`/verifikasi/${cleanId}`);
+    } catch (err) {
+      console.error("Scan error:", err);
       setError("Gagal memeriksa transaksi. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
@@ -121,7 +131,7 @@ export default function ScanPage() {
                 <div className="relative flex-1">
                   <Input
                     id="transactionId"
-                    placeholder="TXN-xxxxxxxxxx-XXXXXXXXX"
+                    placeholder="a2P67jhJ6kqO (tanpa #)"
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleScan()}

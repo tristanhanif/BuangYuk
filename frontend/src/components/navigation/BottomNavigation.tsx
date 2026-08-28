@@ -15,7 +15,7 @@ const userNavItems = [
 
 const verifierNavItems = [
   { href: "/scan", label: "Scan QR", icon: QrCode },
-  { href: "/scan", label: "Verifikasi", icon: ScanLine },
+  { href: "/verifikasi", label: "Verifikasi", icon: ScanLine },
 ];
 
 export function BottomNavigation({ role = "user" }: { role?: "user" | "verifier" }) {
@@ -25,12 +25,12 @@ export function BottomNavigation({ role = "user" }: { role?: "user" | "verifier"
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
       <div className="flex items-center justify-around h-16">
-        {navItems.map((item) => {
+        {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
-              key={item.href}
+              key={index}
               href={item.href}
               className={cn(
                 "flex flex-col items-center gap-1 px-3 py-2 text-sm transition-colors",
