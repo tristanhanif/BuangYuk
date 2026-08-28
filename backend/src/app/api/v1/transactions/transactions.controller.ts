@@ -1,4 +1,4 @@
-import { Controller, Post, Get, UseGuards, Body } from "@nestjs/common";
+import { Controller, Post, Get, UseGuards, Body, Req, BadRequestException } from "@nestjs/common";
 import { AuthGuard } from "@/common/guards/authGuard";
 import { RoleGuard } from "@/common/guards/roleGuard";
 import { wasteSchema, verificationSchema, rewardSchema } from "@/common/validators";
@@ -8,15 +8,17 @@ import { NotificationService } from "@/common/services/notificationService";
 
 @Controller("v1/transactions")
 export class TransactionsController {
-  private calculator = new CarbonCalculator();
-  private transactionService = new TransactionService();
-  private notificationService = new NotificationService();
+  constructor(
+    private readonly calculator: CarbonCalculator,
+    private readonly transactionService: TransactionService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
-  submitWasteDraft(@Body() body: any) {
+  async submitWasteDraft(@Body() body: any) {
     const parsed = wasteSchema.parse(body);
-    const result = this.calculator.calculate(parsed);
+    const result = await this.calculator.calculate(parsed);
 
     const mockTransactionId = `tx_${Date.now()}`;
 
@@ -30,7 +32,7 @@ export class TransactionsController {
 
   @Post("verify")
   @UseGuards(AuthGuard, new (RoleGuard)(["VERIFIER", "ADMIN"]))
-  async verifyWasteTransaction(@Body() body: any) {
+  async verifyWasteTransaction(@Req() req: any, @Body() body: any) {
     const parsed = verificationSchema.parse(body);
     const result = await this.transactionService.executeVerificationTransaction(
       parsed.transactionId,
@@ -38,8 +40,8 @@ export class TransactionsController {
       parsed.adjustedSubCategoryId
     );
 
-    this.notificationService.sendVerificationNotification(
-      "user_123",
+    await this.notificationService.sendVerificationNotification(
+      req.user.uid,
       parsed.transactionId,
       result.verifiedCo2eSaved,
       result.earnedEcoPoints
@@ -53,10 +55,11 @@ export class TransactionsController {
 
   @Post("reward/redeem")
   @UseGuards(AuthGuard)
-  async redeemReward(@Body() body: any) {
+  async redeemReward(@Req() req: any, @Body() body: any) {
     const parsed = rewardSchema.parse(body);
     return {
       success: true,
+      userId: req.user.uid,
       ...parsed,
     };
   }

@@ -27,3 +27,49 @@ export const rewardSchema = z.object({
 });
 
 export type RewardSchema = z.infer<typeof rewardSchema>;
+
+// --- Pickup Schemas ---
+
+export const createPickupSchema = z.object({
+  regionId: z.string().nonempty("Region ID is required"),
+  wasteItems: z.array(z.object({
+    categoryId: z.string(),
+    categoryLabel: z.string(),
+    quantity: z.number().positive(),
+    unit: z.string(),
+    weightKg: z.number().positive(),
+    grade: z.string().optional(),
+    condition: z.string().optional(),
+    material: z.string().optional(),
+  })).min(1, "At least one waste item required"),
+  estimatedWeight: z.number().positive(),
+  pickupLocation: z.object({ lat: z.number(), lng: z.number() }),
+  pickupAddress: z.string().nonempty(),
+  proofPhotoUrls: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+  preferredTime: z.string().optional(),
+});
+
+export type CreatePickupSchema = z.infer<typeof createPickupSchema>;
+
+// --- Dispute Schemas ---
+
+export const createDisputeSchema = z.object({
+  pickupId: z.string().nonempty(),
+  category: z.enum(["weight", "price", "material", "condition", "pickup", "payment", "other"]),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  evidencePhotoUrls: z.array(z.string()).optional(),
+});
+
+export type CreateDisputeSchema = z.infer<typeof createDisputeSchema>;
+
+// --- Marketplace Schemas ---
+
+export const createOrderSchema = z.object({
+  productId: z.string().nonempty(),
+  quantity: z.number().positive(),
+  shippingAddress: z.string().nonempty(),
+  commissionRate: z.number().min(0).max(1).optional(),
+});
+
+export type CreateOrderSchema = z.infer<typeof createOrderSchema>;

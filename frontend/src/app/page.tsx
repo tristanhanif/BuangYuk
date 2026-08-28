@@ -22,7 +22,7 @@ export default function Home() {
               dan gamifikasi ekologi. Setor sampah, dapatkan uang & poin, lihat dampak karbonmu.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/register">
+              <Link href="/register-role">
                 <Button size="xl" className="gap-2">
                   Mulai Sekarang <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -206,7 +206,7 @@ export default function Home() {
                 Bergabunglah dengan ribuan pengguna yang sudah mengubah sampah jadi nilai.
                 Daftar gratis, mulai setor hari ini.
               </p>
-              <Link href="/register">
+              <Link href="/register-role">
                 <Button size="xl" variant="secondary" className="gap-2">
                   Daftar Sekarang <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -230,7 +230,9 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Fitur</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link href="/dashboard" className="hover:text-primary">Dashboard</Link></li>
-                <li><Link href="/input-sampah" className="hover:text-primary">Input Sampah</Link></li>
+                <li><Link href="/input-sampah" className="hover:text-primary">Setor Sampah</Link></li>
+                <li><Link href="/wallet" className="hover:text-primary">Wallet</Link></li>
+                <li><Link href="/marketplace" className="hover:text-primary">Marketplace</Link></li>
                 <li><Link href="/carbon-tracker" className="hover:text-primary">Carbon Tracker</Link></li>
                 <li><Link href="/edukasi" className="hover:text-primary">Edukasi</Link></li>
               </ul>

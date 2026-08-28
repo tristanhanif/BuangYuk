@@ -1,11 +1,14 @@
+export type UserRole = "customer" | "collector" | "bank_sampah" | "umkm" | "admin" | "user" | "verifier";
+
 export interface User {
   uid: string;
   email: string;
   displayName: string;
   photoURL?: string;
-  role: "user" | "verifier" | "admin";
+  role: UserRole;
   phoneNumber?: string;
   address?: string;
+  regionId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
